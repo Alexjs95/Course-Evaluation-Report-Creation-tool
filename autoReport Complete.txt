@@ -1,0 +1,238 @@
+Sub AutoReport()
+'Written by: Alex Scotson-Brierley
+'Last updated: 28/08/2017
+'
+'Decription: This macro is used to automatically convert the data exported from qualtrics into a report format.
+'            The user is required to paste the data (all columns) that they want to be part of the report into the data sheet before running.
+'
+'            * NOTE * I know this could be improved however it was my first time using VBA and it works at this date
+'            * Any changes to the cell numbers in the report template will lead to this being broken.
+'            * Any changes to the qualtrics exported data layout will lead to this being broken.
+With ActiveSheet
+    'Remove unnecessary rows
+    Columns("A:Q").Select
+    Application.CutCopyMode = False
+    Selection.Delete Shift:=xlToLeft
+    
+    'Remove any . = - from any results
+    Columns("A:W").Select
+    Selection.Replace What:=".*", Replacement:="", LookAt:=xlPart, SearchOrder _
+        :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+    Selection.Replace What:="=*", Replacement:="", LookAt:=xlPart, SearchOrder _
+        :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+    Selection.Replace What:="-*", Replacement:="", LookAt:=xlPart, SearchOrder _
+        :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+        
+    Sheets("Data").Range("AB2").Copy Destination:=Sheets("Report").Range("B3:I4")       'Course title
+    Sheets("Data").Range("AC2").Copy Destination:=Sheets("Report").Range("B5:I6")       'Professor
+    Sheets("Data").Range("AD2").Copy Destination:=Sheets("Report").Range("C7:I8")       'Assistant
+    Sheets("Data").Range("AE2").Copy Destination:=Sheets("Report").Range("I9:I10")      'Department
+    Sheets("Data").Range("AG2").Copy Destination:=Sheets("Report").Range("C9:C10")       'Year
+    Sheets("Data").Range("AF2").Copy Destination:=Sheets("Report").Range("F9:F10")       'term
+    'count how many rows in use
+    lastrow = .Cells(.Rows.Count, "A").End(xlUp).Row
+    datarow = lastrow + 1
+    countrange = "A2:A" + CStr(lastrow)
+    
+    'Works out total particpants and pastes the value into the report
+    totalRepliesCell = "A" + CStr(datarow)
+    Worksheets("Data").Range(totalRepliesCell).Formula = "=COUNTA(" & countrange & ")"
+    Sheets("Data").Range(totalRepliesCell).Copy Destination:=Sheets("Report").Range("F11:F12")
+    
+    datarow = lastrow + 2
+    currentrow = datarow
+    Range("A" & datarow).Select
+    Application.CutCopyMode = False
+    
+    'Counts the result 5 for each question.
+    range1 = "A" + CStr(currentrow) + ":AI" + CStr(currentrow)
+    Worksheets("Data").Range(range1).Formula = "=COUNTIF(" & countrange & ",5)"
+    Worksheets("Data").Range(range1).Value = Worksheets("Data").Range(range1).Value
+    
+    'Counts the result 4 for each question.
+    currentrow = currentrow + 1
+    range2 = "A" + CStr(currentrow) + ":AI" + CStr(currentrow)
+    Worksheets("Data").Range(range2).Formula = "=COUNTIF(" & countrange & ",4)"
+    Worksheets("Data").Range(range2).Value = Worksheets("Data").Range(range2).Value
+    
+    'Counts the result 3 for each question.
+    currentrow = currentrow + 1
+    range3 = "A" + CStr(currentrow) + ":AI" + CStr(currentrow)
+    Worksheets("Data").Range(range3).Formula = "=COUNTIF(" & countrange & ",3)"
+    Worksheets("Data").Range(range3).Value = Worksheets("Data").Range(range3).Value
+    
+    'Counts the result 2 for each question.
+    currentrow = currentrow + 1
+    range4 = "A" + CStr(currentrow) + ":AI" + CStr(currentrow)
+    Worksheets("Data").Range(range4).Formula = "=COUNTIF(" & countrange & ",2)"
+    Worksheets("Data").Range(range4).Value = Worksheets("Data").Range(range4).Value
+    
+    'Counts the result 1 for each question.
+    currentrow = currentrow + 1
+    range5 = "A" + CStr(currentrow) + ":AI" + CStr(currentrow)
+    Worksheets("Data").Range(range5).Formula = "=COUNTIF(" & countrange & ",1)"
+    Worksheets("Data").Range(range5).Value = Worksheets("Data").Range(range5).Value
+    
+    'Copies all numerical values from worksheet 2 to worksheet 1 (report)
+    Sheets("Data").Range("A" + CStr(datarow) + ":A" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F18")
+    Sheets("Data").Range("B" + CStr(datarow) + ":B" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F28")
+    Sheets("Data").Range("C" + CStr(datarow) + ":C" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F38")
+    Sheets("Data").Range("D" + CStr(datarow) + ":D" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F53")
+    Sheets("Data").Range("E" + CStr(datarow) + ":E" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F63")
+    Sheets("Data").Range("F" + CStr(datarow) + ":F" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F73")
+    Sheets("Data").Range("G" + CStr(datarow) + ":G" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F83")
+    Sheets("Data").Range("H" + CStr(datarow) + ":H" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F93")
+    Sheets("Data").Range("I" + CStr(datarow) + ":I" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F103")
+    Sheets("Data").Range("J" + CStr(datarow) + ":J" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F113")
+    Sheets("Data").Range("K" + CStr(datarow) + ":K" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F123")
+    Sheets("Data").Range("M" + CStr(datarow) + ":M" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F141")
+    Sheets("Data").Range("N" + CStr(datarow) + ":N" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F152")
+    Sheets("Data").Range("O" + CStr(datarow) + ":O" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F162")
+    Sheets("Data").Range("Q" + CStr(datarow) + ":Q" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F179")
+    Sheets("Data").Range("R" + CStr(datarow) + ":R" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F189")
+    Sheets("Data").Range("S" + CStr(datarow) + ":S" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F199")
+    Sheets("Data").Range("U" + CStr(datarow) + ":U" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F214")
+    Sheets("Data").Range("V" + CStr(datarow) + ":V" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F224")
+    Dim i As Integer
+    Dim response As Integer
+    
+    For i = 2 To lastrow
+        If IsEmpty(Range("L" + CStr(i)).Value) = False Then
+            If response = 1 Then
+                writtenanswer = "Response " + CStr(response) + ": " + Range("L" + CStr(i))
+                response = response + 1
+            Else
+                writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range("L" + CStr(i))
+                response = response + 1
+            End If
+        End If
+    Next
+    Worksheets("Data").Range("L" + CStr(lastrow + 2)).Value = writtenanswer
+    Sheets("Data").Range("L" + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range("A133:I133")
+    writtenanswer = ""
+    response = 1
+    
+    
+    For i = 2 To lastrow
+        If IsEmpty(Range("P" + CStr(i)).Value) = False Then
+            If response = 1 Then
+                writtenanswer = "Response " + CStr(response) + ": " + Range("P" + CStr(i))
+                response = response + 1
+            Else
+                writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range("p" + CStr(i))
+                response = response + 1
+            End If
+        End If
+    Next
+    Worksheets("Data").Range("P" + CStr(lastrow + 2)).Value = writtenanswer
+    Sheets("Data").Range("P" + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range("A171:I171")
+    writtenanswer = ""
+    response = 1
+    
+    
+    
+    For i = 2 To lastrow
+        If IsEmpty(Range("T" + CStr(i)).Value) = False Then
+            If response = 1 Then
+                writtenanswer = "Response " + CStr(response) + ": " + Range("T" + CStr(i))
+                response = response + 1
+            Else
+                writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range("T" + CStr(i))
+                response = response + 1
+            End If
+        End If
+    Next
+    If Len(writtenanswer) > 5 Then
+       writtenanswer = Left(writtenanswer, Len(writtenanswer) - 2)
+    End If
+    Worksheets("Data").Range("T" + CStr(lastrow + 2)).Value = writtenanswer
+    Sheets("Data").Range("T" + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range("A209:I209")
+    writtenanswer = ""
+    response = 1
+    
+    
+    For i = 2 To lastrow
+        If IsEmpty(Range("W" + CStr(i)).Value) = False Then
+            If response = 1 Then
+                writtenanswer = "Response " + CStr(response) + ": " + Range("W" + CStr(i))
+                response = response + 1
+            Else
+                writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range("W" + CStr(i))
+                response = response + 1
+            End If
+        End If
+    Next
+    Worksheets("Data").Range("W" + CStr(lastrow + 2)).Value = writtenanswer
+    Sheets("Data").Range("W" + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range("A234:I234")
+    writtenanswer = ""
+    response = 1
+    
+    
+    For i = 2 To lastrow
+        If IsEmpty(Range("X" + CStr(i)).Value) = False Then
+            If response = 1 Then
+                writtenanswer = "Response " + CStr(response) + ": " + Range("X" + CStr(i))
+                response = response + 1
+            Else
+                writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range("X" + CStr(i))
+                response = response + 1
+            End If
+        End If
+    Next
+    Worksheets("Data").Range("X" + CStr(lastrow + 2)).Value = writtenanswer
+    Sheets("Data").Range("X" + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range("A239:I239")
+    writtenanswer = ""
+    response = 1
+    
+    
+    For i = 2 To lastrow
+        If IsEmpty(Range("Y" + CStr(i)).Value) = False Then
+            If response = 1 Then
+                writtenanswer = "Response " + CStr(response) + ": " + Range("Y" + CStr(i))
+                response = response + 1
+            Else
+                writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range("Y" + CStr(i))
+                response = response + 1
+            End If
+        End If
+    Next
+    Worksheets("Data").Range("Y" + CStr(lastrow + 2)).Value = writtenanswer
+    Sheets("Data").Range("Y" + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range("A243:I243")
+    writtenanswer = ""
+    response = 1
+    
+    
+    For i = 2 To lastrow
+        If IsEmpty(Range("Z" + CStr(i)).Value) = False Then
+            If response = 1 Then
+                writtenanswer = "Response " + CStr(response) + ": " + Range("Z" + CStr(i))
+                response = response + 1
+            Else
+                writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range("Z" + CStr(i))
+                response = response + 1
+            End If
+        End If
+    Next
+    Worksheets("Data").Range("Z" + CStr(lastrow + 2)).Value = writtenanswer
+    Sheets("Data").Range("Z" + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range("A247:I247")
+    writtenanswer = ""
+    response = 1
+    
+    
+    For i = 2 To lastrow
+        If IsEmpty(Range("AA" + CStr(i)).Value) = False Then
+            If response = 1 Then
+                writtenanswer = "Response " + CStr(response) + ": " + Range("AA" + CStr(i))
+                response = response + 1
+            Else
+                writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range("AA" + CStr(i))
+                response = response + 1
+            End If
+        End If
+    Next
+    Worksheets("Data").Range("AA" + CStr(lastrow + 2)).Value = writtenanswer
+    Sheets("Data").Range("AA" + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range("A251:I251")
+    writtenanswer = ""
+    response = 1
+    End With
+End Sub

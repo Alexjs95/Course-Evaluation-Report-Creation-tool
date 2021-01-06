@@ -1,0 +1,132 @@
+Sub AutoReport()
+' Written by: Alex Scotson-Brierley
+' Last updated: 12/09/2017
+'
+' Decription: This macro is used to automatically convert the data exported from qualtrics into a report format.
+'            The user is required to paste the data (all columns) that they want to be part of the report into the data sheet before running.
+'
+'            * NOTE *
+'            * Any changes to the cell numbers in the report template will lead to this being broken.
+'            * Any changes to the qualtrics exported data layout will lead to this being broken.
+'
+
+Worksheets("Data").Activate
+With ActiveSheet
+    'Remove unnecessary rows
+    Columns("A:Q").Select
+    Application.CutCopyMode = False
+    Selection.Delete Shift:=xlToLeft
+    
+    'Removes anything after a . = i for the multiple choice questions
+    Columns("A:W").Select
+    Selection.Replace What:=".*", Replacement:="", LookAt:=xlPart, SearchOrder _
+        :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+    Selection.Replace What:="=*", Replacement:="", LookAt:=xlPart, SearchOrder _
+        :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+    Selection.Replace What:="-*", Replacement:="", LookAt:=xlPart, SearchOrder _
+        :=xlByRows, MatchCase:=False, SearchFormat:=False, ReplaceFormat:=False
+        
+    Sheets("Data").Range("AB2").Copy Destination:=Sheets("Report").Range("B3:I4")       'Course title
+    courseTitle = Sheets("Data").Range("AB2")
+    Sheets("Data").Range("AC2").Copy Destination:=Sheets("Report").Range("B5:I6")       'Professor
+    professor = Sheets("Data").Range("AC2")
+    Sheets("Data").Range("AD2").Copy Destination:=Sheets("Report").Range("C7:I8")       'Assistant
+    Sheets("Data").Range("AE2").Copy Destination:=Sheets("Report").Range("I9:I10")      'Department
+    Sheets("Data").Range("AG2").Copy Destination:=Sheets("Report").Range("C9:C10")       'Year
+    Sheets("Data").Range("AF2").Copy Destination:=Sheets("Report").Range("F9:F10")       'term
+    
+    Sheets("Report").Select
+    With ActiveSheet.PageSetup
+        .LeftFooter = "Title: " & courseTitle & "" & Chr(10) & "By: " & professor & ""
+    End With
+    Worksheets("Data").Activate
+    
+    'count how many rows in use
+    lastrow = .Cells(.Rows.Count, "A").End(xlUp).Row
+    datarow = lastrow + 1
+    countrange = "A2:A" + CStr(lastrow)
+    
+    'Works out total particpants and pastes the value into the report
+    totalRepliesCell = "A" + CStr(datarow)
+    Worksheets("Data").Range(totalRepliesCell).Formula = "=COUNTA(" & countrange & ")"
+    Sheets("Data").Range(totalRepliesCell).Copy Destination:=Sheets("Report").Range("F11:F12")
+    
+    datarow = lastrow + 2
+    currentrow = datarow
+    Range("A" & datarow).Select
+    Application.CutCopyMode = False
+    
+    k = 5
+    For j = 1 To 5
+        
+        range1 = "A" + CStr(currentrow) + ":AI" + CStr(currentrow)
+        Worksheets("Data").Range(range1).Formula = "=COUNTIF(" & countrange & "," & k & ")"
+        Worksheets("Data").Range(range1).Value = Worksheets("Data").Range(range1).Value
+    
+        'Counts the result 4 for each question.
+        currentrow = currentrow + 1
+        k = k - 1
+    Next
+    
+    'Copies all numerical values from worksheet 2 to worksheet 1 (report)
+    Sheets("Data").Range("A" + CStr(datarow) + ":A" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F18")        'Q1
+    Sheets("Data").Range("B" + CStr(datarow) + ":B" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F28")        'Q2
+    Sheets("Data").Range("C" + CStr(datarow) + ":C" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F38")        'Q3
+    Sheets("Data").Range("D" + CStr(datarow) + ":D" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F53")        'Q4
+    Sheets("Data").Range("E" + CStr(datarow) + ":E" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F63")        'Q5
+    Sheets("Data").Range("F" + CStr(datarow) + ":F" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F73")        'Q6
+    Sheets("Data").Range("G" + CStr(datarow) + ":G" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F83")        'Q7
+    Sheets("Data").Range("H" + CStr(datarow) + ":H" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F93")        'Q8
+    Sheets("Data").Range("I" + CStr(datarow) + ":I" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F103")       'Q9
+    Sheets("Data").Range("J" + CStr(datarow) + ":J" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F113")       'Q10
+    Sheets("Data").Range("K" + CStr(datarow) + ":K" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F123")       'Q11
+    Sheets("Data").Range("M" + CStr(datarow) + ":M" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F141")       'Q12
+    Sheets("Data").Range("N" + CStr(datarow) + ":N" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F152")       'Q13
+    Sheets("Data").Range("O" + CStr(datarow) + ":O" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F162")       'Q14
+    Sheets("Data").Range("Q" + CStr(datarow) + ":Q" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F179")       'Q15
+    Sheets("Data").Range("R" + CStr(datarow) + ":R" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F189")       'Q16
+    Sheets("Data").Range("S" + CStr(datarow) + ":S" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F199")       'Q17
+    Sheets("Data").Range("U" + CStr(datarow) + ":U" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F214")       'Q19
+    Sheets("Data").Range("V" + CStr(datarow) + ":V" + CStr(datarow + 4)).Copy Destination:=Sheets("Report").Range("F224")       'Q20
+    
+    Dim i As Integer
+    Dim response As Integer
+    Dim letters(1 To 8) As String   'array to hold cell references of where written answers are.
+    letters(1) = "L"        'Q11
+    letters(2) = "P"        'Q14
+    letters(3) = "T"        'Q18
+    letters(4) = "W"        'Q21
+    letters(5) = "X"        'Q22
+    letters(6) = "Y"        'Q23
+    letters(7) = "Z"        'Q24
+    letters(8) = "AA"       'Q25
+    
+    Dim cellRanges(1 To 8) As String        'array to hold cell references of where the written answered are copied to in the report.
+    cellRanges(1) = "A133:I133"
+    cellRanges(2) = "A171:I171"
+    cellRanges(3) = "A209:I209"
+    cellRanges(4) = "A234:I234"
+    cellRanges(5) = "A239:I239"
+    cellRanges(6) = "A243:I243"
+    cellRanges(7) = "A247:I247"
+    cellRanges(8) = "A251:I251"
+    
+    For j = 1 To 8
+        response = 1
+        For i = 2 To lastrow
+            If IsEmpty(Range(letters(j) + CStr(i)).Value) = False Then
+                If response = 1 Then
+                    writtenanswer = "Response " + CStr(response) + ": " + Range(letters(j) + CStr(i))
+                    response = response + 1
+                Else
+                    writtenanswer = writtenanswer + "    Response " + CStr(response) + ": " + Range(letters(j) + CStr(i))
+                    response = response + 1
+                End If
+            End If
+        Next
+        Worksheets("Data").Range(letters(j) + CStr(lastrow + 2)).Value = writtenanswer
+        Sheets("Data").Range(letters(j) + CStr(lastrow + 2)).Copy Destination:=Sheets("Report").Range(cellRanges(j))
+        writtenanswer = ""
+    Next
+    End With
+End Sub

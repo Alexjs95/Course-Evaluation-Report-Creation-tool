@@ -1,0 +1,178 @@
+Dim sFolder As String
+Dim courseTitle As String
+
+Private Sub btnExport_Click()
+    Worksheets("Report").Activate
+    With ActiveSheet
+        If Range("B3").Value = "" Then
+            MsgBox "You must first generate a report before exporting it."
+        Else
+            If Range("C11").Value = "" Then
+                MsgBox "You must enter the number of students on the course then regenerate the report."
+            ElseIf optionYes.Value = False Then
+                MsgBox "You must have selected yes to export a PDF."
+            ElseIf sFolder = "" Then
+                MsgBox "You must first choose a directory to export the PDF to."
+            Else
+                
+               ' optionYes.Value = True And Not IsEmpty(Label5)
+                courseTitle = Range("B3")
+                courseTitle = Replace(courseTitle, "/", "")
+                courseTitle = Replace(courseTitle, "\", "")
+                courseTitle = Replace(courseTitle, ":", "")
+                courseTitle = Replace(courseTitle, "?", "")
+                courseTitle = Replace(courseTitle, "*", "")
+                courseTitle = Replace(courseTitle, "<", "")
+                courseTitle = Replace(courseTitle, ">", "")
+                courseTitle = Replace(courseTitle, " ", "")
+                
+                ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, Filename:= _
+                "" & sFolder & "\" & courseTitle & ".pdf", _
+                Quality:=xlQualityStandard, IncludeDocProperties:=True, IgnorePrintAreas _
+                :=False, OpenAfterPublish:=True
+                
+                
+                btnDirectory.Visible = False
+                Label5.Visible = False
+                Label5 = ""
+                sFolder = ""
+                txtStudents = ""
+                courseTitle = ""
+                cbbCourse = ""
+                optionYes.Value = False
+                optionYes.Value = False
+            End If
+        End If
+    End With
+End Sub
+
+Private Sub cbbCourse_Change()
+    courseTitle = cbbCourse.Value
+End Sub
+
+
+Private Sub btnGenerate_Click()
+    If cbbCourse.Value = "" Then
+        MsgBox "Please select a course"
+    Else
+        Sheets("OriginalData").Range("AS1").AutoFilter Field:=45, Criteria1:=cbbCourse.Value
+        Call autoReport
+        If Sheets("OriginalData").AutoFilterMode Then
+            Sheets("OriginalData").ShowAllData
+        End If
+            
+        totalStudents = txtStudents
+        Worksheets("Report").Activate
+        With ActiveSheet
+            Range("C11").Value = totalStudents
+        End With
+        
+        'cbbCourse = ""
+        'txtStudents = ""
+    End If
+End Sub
+
+Private Sub btnCancel_Click()
+    Unload Me
+End Sub
+
+Private Sub btnDirectory_Click()
+    ' Open the select folder prompt
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        .Title = "Select a Folder"
+        If .Show = -1 Then ' if OK is pressed
+            sFolder = .SelectedItems(1)
+            Label5 = sFolder
+        End If
+    End With
+End Sub
+
+Private Sub btnReset_Click()
+    Call resetReport
+    btnDirectory.Visible = False
+    Label5.Visible = False
+    Label5 = ""
+                sFolder = ""
+                courseTitle = ""
+                txtStudents = ""
+                cbbCourse = ""
+                optionYes.Value = False
+                optionYes.Value = False
+End Sub
+
+Private Sub optionYes_Click()
+    If txtStudents = "" And Worksheets("Report").Range("C11").Value = "" Then
+        MsgBox "If you want to export you must enter the number of students on the course"
+        optionYes.Value = False
+        Exit Sub
+    End If
+    btnDirectory.Visible = True
+    Label5.Visible = True
+    Label5 = ""
+    sFolder = ""
+End Sub
+
+Private Sub optionYes_Click()
+    btnDirectory.Visible = False
+    Label5.Visible = False
+    Label5 = ""
+    sFolder = ""
+End Sub
+
+Private Sub txtStudents_Change()
+   If txtStudents = "" Then
+        optionYes.Value = False
+    End If
+    btnDirectory.Visible = False
+    Label5.Visible = False
+End Sub
+
+Private Sub Userform_initialize()
+    With cbbCourse
+    .Style = fmStyleDropDownList
+        Me.cbbCourse.List = Worksheets("OriginalData").Range("AS4:AS5000").Value
+        Dim i As Long
+        Dim j As Long
+   
+        For i = 0 To .ListCount + 1
+            For j = .ListCount - 1 To (i + 1) Step -1
+                If .List(j) = .List(i) Then
+                .RemoveItem j
+                End If
+            Next
+        Next
+   End With
+End Sub
+
+Private Sub UserForm_Activate()
+    Me.StartUpPosition = 0
+    Me.Top = Application.Top + 350
+    Me.Left = Application.Left + Application.Width - Me.Width - 650
+End Sub
+
+
+
+
+
+
+'Private Sub CommandButton4_Click()
+'    If cbbCourse.Value = "" Then
+'        MsgBox "Please select a course"
+'    Else
+'        Sheets("OriginalData").Range("AS1").AutoFilter Field:=45, Criteria1:=cbbCourse.Value
+'        Call autoReport
+'        If Sheets("OriginalData").AutoFilterMode Then Sheets("OriginalData").ShowAllData
+'        totalStudents = txtStudents
+'        Worksheets("Report").Activate
+'        With ActiveSheet
+'            Range("C11").Value = totalStudents
+'
+'            If optionYes.Value = True Then
+'                ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, Filename:= _
+'                "" & sFolder & "\" & courseTitle & "", _
+'                Quality:=xlQualityStandard, IncludeDocProperties:=True, IgnorePrintAreas _
+'                :=False, OpenAfterPublish:=True
+'            End If
+'        End With
+'    End If
+'End Sub
